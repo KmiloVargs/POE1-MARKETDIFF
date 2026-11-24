@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Margen: diferencias de precio en PoE 1</title>
+<style>
+:root{
+  --bg:#12171a; --panel:#192024; --panel2:#20292e; --line:#2d383e; --text:#e4e6df; --mute:#93a0a1;
+  --teal:#5fc7b2; --gold:#e0b25c; --up:#7fd08a; --down:#e98272; --focus:#9be3d4;
+  --head:Bahnschrift,"DIN Condensed","Roboto Condensed","Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",system-ui,sans-serif}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+a{color:var(--teal)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px 60px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;padding:26px 0 16px}
+h1{font:600 34px/1 var(--head);margin:0;letter-spacing:.01em}
+header p{margin:4px 0 0;color:var(--mute)}
+.hctl{margin-left:auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.status{color:var(--mute);font-size:13px}
+.status.bad{color:var(--down)}
+select,input[type=number],input[type=text],input[type=search]{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:6px 9px;min-width:0}
+input[type=number]{width:92px}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--teal)}
+button.pri{background:var(--teal);border-color:var(--teal);color:#0d1716;font-weight:600}
+nav{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+nav button{border:0;background:none;border-radius:0;padding:12px 14px;white-space:nowrap;color:var(--mute);border-bottom:3px solid transparent}
+nav button[aria-selected=true]{color:var(--text);border-bottom-color:var(--teal)}
+nav small{color:var(--gold);margin-left:5px;font-variant-numeric:tabular-nums}
+.filters{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:14px 0}
+.filters label{display:flex;gap:7px;align-items:center;color:var(--mute);font-size:14px}
+.intro{max-width:78ch;color:var(--mute);margin:16px 0 0}
+.intro b{color:var(--text)}
+h2{font:600 21px/1.2 var(--head);margin:26px 0 8px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{font-weight:500;font-size:13px;color:var(--mute);text-align:right;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--panel2)}
+th.l,td.l{text-align:left}
+th button{border:0;background:none;padding:0;color:inherit}
+th button:hover{color:var(--text)}
+td{padding:8px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+tr:last-child>td{border-bottom:0}
+tr.row{cursor:pointer}
+tr.row:hover td{background:#1e272c}
+.nm{display:flex;gap:10px;align-items:center;white-space:normal;min-width:210px}
+.nm img{width:28px;height:28px;object-fit:contain;flex:none}
+.nm button{border:0;background:none;padding:0;text-align:left;border-radius:3px}
+.nm i{display:block;font-style:normal;font-size:12.5px;color:var(--mute)}
+.up{color:var(--up)} .down{color:var(--down)} .gold{color:var(--gold)} .mute{color:var(--mute)}
+.sub{display:block;font-size:12.5px;color:var(--mute)}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:4px;padding:0 6px;color:var(--mute);margin-right:4px}
+.tag.alta{color:var(--up);border-color:#3c5f43}.tag.media{color:var(--gold);border-color:#5f5033}.tag.baja{color:var(--down);border-color:#613d37}
+.det td{background:#151b1f;text-align:left;white-space:normal;padding:14px 16px}
+.det .g{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px 30px}
+.det ol{margin:0;padding-left:20px}.det ul{margin:0;padding:0;list-style:none}
+.det ul li{display:flex;justify-content:space-between;gap:14px;border-bottom:1px dotted var(--line);padding:2px 0}
+.det .warn{color:var(--gold);margin:8px 0 0}
+.det .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px 15px}
+.card.best{border-color:var(--teal)}
+.card h3{margin:0 0 4px;font:600 16px/1.2 var(--head)}
+.card .big{font:600 24px/1.2 var(--head);font-variant-numeric:tabular-nums}
+.card p{margin:2px 0;color:var(--mute);font-size:13.5px}
+.more{margin:12px 0;text-align:center}
+.empty{padding:26px;color:var(--mute);text-align:center}
+.form{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:14px}
+.form label{display:grid;gap:4px;font-size:13px;color:var(--mute)}
+.parts{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+.parts button{font-size:13px}
+footer{margin-top:40px;color:var(--mute);font-size:13px;max-width:85ch}
+@media(max-width:720px){.hctl{margin-left:0}.det .g{grid-template-columns:1fr}.wrap{padding:0 14px 40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><h1>Margen</h1><p>Diferencias de precio en Path of Exile 1, con datos de poe.ninja</p></div>
+  <div class="hctl">
+    <label>Liga <select id="league" aria-label="Liga"></select></label>
+    <button id="reload">Actualizar</button>
+    <span class="status" id="status" role="status">Cargando…</span>
+  </div>
+</header>
+<nav id="tabs" role="tablist"></nav>
+<main id="main"></main>
+<footer>Los precios son estimaciones de poe.ninja y se actualizan cada 15 minutos aproximadamente. Antes de comprar, mira el precio real en el mercado del juego. Página personal, sin relación con poe.ninja ni con Grinding Gear Games.</footer>
+</div>
+<script>
+'use strict';
+/* ---------- Utilidades ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store={get(k,d){try{const v=localStorage.getItem('margen.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('margen.'+k,JSON.stringify(v))}catch(e){}}};
+const num=(v,d)=>v.toLocaleString('es',{minimumFractionDigits:0,maximumFractionDigits:d});
+const c=v=>v==null||!isFinite(v)?'–':num(v,Math.abs(v)<10?2:Math.abs(v)<100?1:0)+' c';
+const sg=v=>(v>0?'+':'')+c(v);
+const dv=v=>S.div?num(v/S.div,2)+' div':'';
+const pct=v=>!isFinite(v)?'–':(v>0?'+':'')+num(v,0)+'%';
+const cls=v=>v>0?'up':v<0?'down':'';
+
+/* ---------- Estado ---------- */
+const DEF={haircut:10,hcEx:2,budget:500,conf:'media',rng:true,play:true,neg:false,l339:40,l500:50,l750:55,p21:12.5,p23:10,primal:30};
+const S={cfg:Object.assign({},DEF,store.get('cfg',{})),tab:store.get('tab','top'),idx:new Map(),raw:{},div:0,opps:[],sort:{},show:{},open:new Set(),q:'',custom:store.get('custom',[]),log:store.get('log',[]),draft:{in:[],out:[]},stale:false,time:null,failed:[]};
+const EX=['Currency','Fragment','Omen','DivinationCard','Oil','DeliriumOrb','Thread','Essence','Fossil'];
+const ST=['Beast','Map','UniqueArmour','UniqueWeapon','UniqueAccessory','SkillGem','UniqueFlask','UniqueJewel'];
+const RANK={alta:3,media:2,baja:1};
+
+/* ---------- Carga ---------- */
+async function getJ(u){const r=await fetch(u);if(!r.ok)throw new Error(u+' '+r.status);if(r.headers.get('X-Stale'))S.stale=true;const t=r.headers.get('X-Data-Time');if(t){const d=new Date(t);if(!S.time||d<S.time)S.time=d}return r.json()}
+let loading=0;
+async function load(){
+  const my=++loading,lg=$('#league').value;
+  setStatus('Cargando precios…');S.stale=false;S.time=null;
+  const raw={},failed=[];const all=[...EX.map(t=>['ex',t]),...ST.map(t=>['st',t])];
+  let n=0;
+  for(const [k,t] of all){
+    try{raw[k+t]=await getJ(`/api/${k}/${t}?league=${encodeURIComponent(lg)}`)}catch(e){failed.push(t)}
+    if(my!==loading)return;
+    setStatus(`Cargando precios… ${++n} de ${all.length}`);
+  }
+  S.raw=raw;S.failed=failed;
+  buildIndex();compute();render();
+  const when=S.time?S.time.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}):'';
+  let m=`Precios de las ${when}. 1 divine = ${c(S.div)}`;
+  if(S.stale)m+='. Hay datos antiguos: poe.ninja no respondió';
+  if(failed.length)m+='. Sin datos de: '+failed.join(', ');
+  setStatus(m,S.stale||failed.length);
+}
+function setStatus(t,bad){const e=$('#status');e.textContent=t;e.classList.toggle('bad',!!bad)}
+
+/* ---------- Índice de precios ---------- */
+const exConf=(p,v)=>v>=5000&&v/p>=20?'alta':v>=500&&v/p>=5?'media':'baja';
+const stConf=n=>n>=30?'alta':n>=10?'media':'baja';
+const img=u=>!u?'':u.startsWith('http')?u:'https://web.poecdn.com'+u;
+function put(key,o){const old=S.idx.get(key);if(!old||(o.n||0)>(old.n||0))S.idx.set(key,Object.assign({key},o))}
+function buildIndex(){
+  S.idx=new Map();
+  S.idx.set('Chaos Orb',{key:'Chaos Orb',name:'Chaos Orb',p:1,conf:'alta',type:'Currency',spark:null});
+  for(const t of EX){const d=S.raw['ex'+t];if(!d||!d.lines)continue;
+    const m={};for(const i of d.items||[])m[i.id]=i;
+    for(const l of d.lines){const i=m[l.id];if(!i||!(l.primaryValue>0))continue;
+      put(i.name,{name:i.name,p:l.primaryValue,vol:l.volumePrimaryValue||0,n:l.volumePrimaryValue||0,conf:exConf(l.primaryValue,l.volumePrimaryValue||0),type:t,icon:img(i.image),spark:l.sparkline,ex:true})}}
+  for(const t of ST){const d=S.raw['st'+t];if(!d||!d.lines)continue;
+    for(const l of d.lines){if(!(l.chaosValue>0))continue;
+      const gem=t==='SkillGem',uq=t.startsWith('Unique');
+      const key=gem?`${l.name} (${l.variant})`:uq?l.name+(l.variant?` [${l.variant}]`:'')+(l.links?` ${l.links}L`:''):l.name;
+      put(key,{name:l.name,p:l.chaosValue,n:l.listingCount||0,conf:stConf(l.listingCount||0),type:t,icon:img(l.icon),spark:l.sparkLine,variant:l.variant,links:l.links||0,base:l.baseType,item:l.itemType,kind:l.metadata&&l.metadata.gemKind,corrupt:!!l.corrupted,mods:uq?(l.tradeInfo||[]):[]})}}
+  const dvn=S.idx.get('Divine Orb');S.div=dvn?dvn.p:0;
+}
+const P=k=>S.idx.get(k);
+
+/* ---------- Oportunidades ---------- */
+/* ins/outs: [clave o null, cantidad, etiqueta, precioManual] */
+function opp(o){
+  let cost=0,sell=0,conf='alta',icon=o.icon;
+  const worst=x=>{if(RANK[x]<RANK[conf])conf=x};
+  const read=list=>list.map(([k,q,label,man])=>{const it=k?P(k):null;const p=man!=null?man:it?it.p:null;if(p==null)return null;return{label:label||k,q,p,it}});
+  const a=read(o.ins),b=read(o.outs);
+  if(a.includes(null)||b.includes(null))return;
+  a.forEach(x=>cost+=x.p*x.q);b.forEach(x=>sell+=x.p*x.q);
+  a.forEach(x=>{if(x.it&&x.p*x.q>=cost*.25)worst(x.it.conf)});b.forEach(x=>{if(x.it)worst(x.it.conf)});
+  if(o.sell!=null)sell=o.sell;
+  if(!(cost>0)||!(sell>0))return;
+  const first=b.find(x=>x.it)||a.find(x=>x.it);
+  if(!icon&&first)icon=first.it.icon;
+  const hc=b.every(x=>x.it&&x.it.ex)?S.cfg.hcEx:S.cfg.haircut;const net=sell*(1-hc/100)-cost;
+  const n=b.filter(x=>x.it&&!x.it.ex).map(x=>x.it.n),vol=b.filter(x=>x.it&&x.it.ex).map(x=>x.it.vol);
+  const sp=first&&first.it.spark,tr=sp?sp.totalChange:null;
+  const w=[];if(o.warn)w.push(o.warn);
+  if(tr!=null&&tr<-30)w.push('El precio de venta viene cayendo: '+pct(tr)+' en 7 días.');
+  if(sell/cost>12&&conf!=='alta')w.push('El margen es muy alto para tan pocos anuncios. Puede ser un precio inflado.');
+  if(tr>300&&!first.it.ex)w.push('El precio se disparó '+pct(tr)+' en 7 días. Puede volver a bajar.');
+  S.opps.push(Object.assign({},o,{hc,ex:b.every(x=>x.it&&x.it.ex),id:o.cat+'|'+o.name,cost,sell,net,roi:net/cost*100,conf,icon,a,b,n:n.length?Math.min(...n):null,vol:vol.length?Math.min(...vol):null,spark:sp,tr,w}));
+}
+function linkRoutes(){
+  const g=k=>P(k)&&P(k).p;const r=[];
+  const add=(name,parts,note)=>{if(parts.every(x=>g(x[0])!=null))r.push({name,parts,note,total:parts.reduce((s,x)=>s+g(x[0])*x[1],0)})};
+  add('Bestias',[['Omen of the Jeweller',1],['Black Mórrigan',1],['Craicic Sand Spitter',1]],'Hay que ganar la pelea en la Menagerie.');
+  add('Omens',[['Omen of the Jeweller',1],['Omen of Connections',1]],'Gasta además unos pocos Jeweller y Fusing.');
+  add('Mesa de crafteo',[["Jeweller's Orb",350],['Orb of Fusing',1500]],'Costo fijo: 350 Jeweller y 1.500 Fusing.');
+  return r.sort((x,y)=>x.total-y.total);
+}
+function compute(){
+  S.opps=[];const cfg=S.cfg;
+  /* 6 enlaces: petos y armas */
+  S.routes=linkRoutes();const rt=S.routes[0];
+  if(rt)for(const [k,it] of S.idx){
+    if(it.links!==6||!(it.type==='UniqueArmour'||it.type==='UniqueWeapon'))continue;
+    if(it.item==='One Handed Sword')continue;
+    const bk=k.replace(/ 6L$/,'');if(!P(bk))continue;
+    opp({cat:'links',src:it.type==='UniqueArmour'?'video':'extra',name:k.replace(/ 6L$/,''),note:it.item==='Body Armour'?'Peto':it.item,ins:[[bk,1,'Base sin corromper'],...rt.parts],outs:[[k,1,'Versión 6L']],base:bk,
+      steps:['Compra la base sin corromper, con las mejores tiradas que permita tu presupuesto.','Ponle 6 huecos con Omen of the Jeweller y un Jeweller’s Orb.',`Enlázala por la vía más barata ahora: ${rt.name.toLowerCase()}. ${rt.note}`,'Compara con anuncios de tiradas parecidas y ponla a la venta.'],
+      warn:'El precio 6L mezcla tiradas buenas y malas. Revisa en el mercado cuánto piden por la tuya.'});
+  }
+  /* Gemas */
+  const gcp="Gemcutter's Prism",by={};
+  for(const it of S.idx.values())if(it.type==='SkillGem')(by[it.name]=by[it.name]||{})[it.variant]=it;
+  const lens3=2*cfg.l500+cfg.l750,bram=P('Wild Brambleback');
+  const exUse=bram&&bram.p*4<lens3?{ins:[['Wild Brambleback',4]],txt:'Usa 4 Wild Brambleback (500 M de experiencia cada una).'}:{ins:[[null,2,"Facetor's Lens 500 M",cfg.l500],[null,1,"Facetor's Lens 750 M",cfg.l750]],txt:"Usa 2 Facetor's Lens de 500 M y 1 de 750 M."};
+  S.exUse=exUse;
+  for(const name in by){const v=by[name],key=x=>`${name} (${x})`;
+    const any=Object.values(v)[0];
+    if(any.kind==='exceptional'){
+      for(const [f,t] of [['1','3'],['1/20','3/20']])if(v[f]&&v[t])opp({cat:'gems',src:'video',name:`${name}: ${f} → ${t}`,note:'Excepcional',ins:[[key(f),1],...exUse.ins],outs:[[key(t),1]],steps:[`Compra ${name} ${f} sin corromper.`,exUse.txt+' Necesita 1.666 M en total.',`Véndela como ${t}, sin corromper.`]});
+      continue;
+    }
+    const L=[null,1,"Facetor's Lens 339 M",cfg.l339],L2=[null,2,"Facetor's Lens 339 M",cfg.l339];
+    if(v['1']&&v['20'])opp({cat:'gems',src:'video',name:`${name}: 1 → 20`,note:any.kind==='transfigured'?'Transfigurada':'Nivelado',ins:[[key('1'),1],L],outs:[[key('20'),1]],steps:['Compra la gema a nivel 1, sin corromper.',"Aplica un Facetor's Lens de 339 M.",'Véndela a nivel 20.']});
+    if(v['20/20']){
+      const A=v['1/20']?v['1/20'].p+cfg.l339:Infinity,g=P(gcp),B=v['1']&&g?v['1'].p+2*cfg.l339+g.p:Infinity;
+      if(A<=B&&A<Infinity)opp({cat:'gems',src:'extra',name:`${name}: 1/20 → 20/20`,note:'Un solo lens',ins:[[key('1/20'),1],L],outs:[[key('20/20'),1]],steps:['Compra la gema nivel 1 con 20% de calidad.',"Aplica un Facetor's Lens de 339 M.",'Véndela como 20/20. Te ahorras el segundo lens y el GCP.']});
+      else if(B<Infinity)opp({cat:'gems',src:'video',name:`${name}: 1 → 20/20`,note:'Dos lens y GCP',ins:[[key('1'),1],L2,[gcp,1]],outs:[[key('20/20'),1]],steps:['Compra la gema a nivel 1 y súbela a 20 con un lens.','Véndela al NPC junto con un GCP: vuelve como 1/20.','Aplica el segundo lens y véndela como 20/20.']});
+    }
+    /* Corrupción */
+    const vo=P('Vaal Orb');
+    if(v['20/20']&&v['20/20c']&&v['21/20c']&&vo){
+      const q23=v['20/23c']&&v['20/23c'].conf!=='baja'?v['20/23c'].p:v['20/20c'].p;const a=cfg.p21/100,b=cfg.p23/100,bad=.125+.125,ok=Math.max(0,1-a-b-bad);
+      const ev=a*v['21/20c'].p+b*q23+ok*v['20/20c'].p;
+      opp({cat:'gems',src:'extra',rng:true,name:`${name}: corromper 20/20`,note:'Apuesta con Vaal Orb',ins:[[key('20/20'),1],['Vaal Orb',1]],outs:[[key('21/20c'),1]],sell:ev,
+        steps:['Compra varias 20/20 iguales sin corromper.','Usa un Vaal Orb en cada una.',`Vende según salga: 21/20c a ${c(v['21/20c'].p)}, 20/23c a ${v['20/23c']?c(v['20/23c'].p):'sin dato'}, 20/20c a ${c(v['20/20c'].p)}.`],
+        warn:`Es un promedio: ${cfg.p21}% de 21/20 y ${cfg.p23}% de 20/23 (se cambian en Ajustes). En la mayoría de los intentos pierdes; hazlo solo con varias.`});
+    }
+  }
+  /* Recetas y conversiones */
+  const R=(name,ins,outs,x)=>opp(Object.assign({cat:'recipes',name,ins,outs,src:'extra'},x));
+  const pen=n=>{const ks=['20','20/20'].map(q=>`${n} Penetration Support (${q})`).filter(P).filter(k=>P(k).n>=3);return ks.sort((a,b)=>P(a).p-P(b).p)[0]};
+  const pens=['Fire','Cold','Lightning'].map(pen);
+  if(pens.every(Boolean)){const pi=pens.map(k=>[k,1]).concat([['Replica Bitterdream',1]]);
+    const st=['Compra las tres gemas de penetración a nivel 20 o más y un Replica Bitterdream.','Véndelas juntas a un NPC: recibes Elemental Penetration.'];
+    const wn='Calculado con gemas sin corromper. Comprueba la oferta del NPC antes de aceptar.';
+    R('Elemental Penetration (nivel 1)',pi,[['Elemental Penetration Support (1)',1]],{src:'video',steps:st.concat('Vende la gema a nivel 1.'),warn:wn});
+    R('Elemental Penetration → nivel 20',pi.concat([[null,1,"Facetor's Lens 339 M",cfg.l339]]),[['Elemental Penetration Support (20)',1]],{src:'video',steps:st.concat("Súbela a 20 con un Facetor's Lens."),warn:wn});
+    R('Elemental Penetration → 20/20',pi.concat([[null,2,"Facetor's Lens 339 M",cfg.l339],[gcp,1]]),[['Elemental Penetration Support (20/20)',1]],{src:'video',steps:st.concat("Sube a 20, véndela al NPC con un GCP y vuelve a subirla con otro lens."),warn:wn});
+  }
+  for(const u of ['The Yielding Mortality',"The Torrent's Reclamation","The Tempest's Liberation",'The Immortal Will','The Surging Thoughts'])
+    R(u+' → Fracturing Shard',[[u,1]],[['Fracturing Shard',1]],{src:'video',note:'Vender al NPC',steps:['Compra el único con oro en el mercado (en el video, entre 5.000 y 10.000 de oro cada uno).','Véndelo al NPC, de a uno o de a dos. Con tres iguales se arma otra receta.','Vende los shards o junta 20 para un Fracturing Orb.'],warn:'Comprueba que el NPC ofrezca el shard antes de aceptar. El límite real es tu oro.'});
+  R('20 Fracturing Shard → Fracturing Orb',[['Fracturing Shard',20]],[['Fracturing Orb',1]],{steps:['Compra 20 shards en el intercambio.','Se combinan solos al juntar 20.','Vende el orbe.'],note:'Sin azar'});
+  R('20 Mirror Shard → Mirror of Kalandra',[['Mirror Shard',20]],[['Mirror of Kalandra',1]],{steps:['Junta 20 shards.','Vende el espejo.'],note:'Sin azar'});
+  R('Simulacrum',[['Simulacrum Splinter',300]],[['Simulacrum',1]],{steps:['Compra 300 splinters en el intercambio.','Se combinan al juntar 300.','Vende el Simulacrum.'],note:'Astillas'});
+  for(const [a,b] of [['Timeless Maraketh Splinter','Timeless Maraketh Emblem'],['Timeless Templar Splinter','Timeless Templar Emblem'],['Timeless Vaal Splinter','Timeless Vaal Emblem'],['Timeless Karui Splinter','Timeless Karui Emblem'],['Timeless Eternal Empire Splinter','Timeless Eternal Emblem'],['Ritual Splinter','Ritual Vessel']])
+    R('100 '+a+' → '+b,[[a,100]],[[b,1]],{steps:['Compra 100 en el intercambio.','Se combinan al juntar 100.','Vende el resultado.'],note:'Astillas',warn:'Las astillas sueltas se mueven poco: puede costar juntar 100 a este precio.'});
+  R('Primal Cystcaller → Nightmare Map',[['Primal Cystcaller',1]],[['Nightmare Map',1]],{src:'video',play:true,note:'Bestia',steps:['Compra la bestia.','Haz la receta en la Menagerie y gana la pelea.','Vende el Nightmare Map.']});
+  const th=[...S.idx.values()].filter(x=>x.type==='Thread');
+  if(th.length){const avg=th.reduce((s,x)=>s+x.p,0)/th.length;const best=th.slice().sort((a,b)=>b.p-a.p)[0];
+    R('Primal Crushclaw → 20 threads',[['Primal Crushclaw',1]],[[best.key,1]],{src:'video',rng:true,play:true,sell:avg*20,icon:best.icon,note:'Bestia, promedio',steps:['Compra varias bestias.','Haz la receta: cada una da 20 threads de un tipo al azar.',`Vende los threads. Promedio por bestia: ${c(avg*20)}; el mejor caso es ${best.name}, ${c(best.p*20)}.`],warn:'Supone que los '+th.length+' tipos salen con la misma probabilidad. No hay dato oficial.'})}
+  for(const n of ['Reverence','Trauma','Loneliness'])
+    R(`Memory of ${n} → Echo of ${n}`,[[`Memory of ${n}`,1]],[[`Echo of ${n}`,1]],{src:n==='Reverence'?'video':'extra',unv:n!=='Reverence',play:true,note:'Se juega',steps:['Compra la memoria.','Completa sus 4 mapas.','Vende el Echo. En el video, un Mirage en el último mapa duplica el premio.'],warn:n==='Reverence'?'Hay que jugar los mapas; cuenta tu tiempo.':`El video solo muestra la de Reverence. Que ${n} funcione igual es una suposición mía por el nombre: prueba con una sola primero.`});
+  /* Subir de nivel 3:1 */
+  const tiers=['Whispering','Muttering','Weeping','Wailing','Screaming','Shrieking','Deafening'];
+  for(const k of S.idx.keys()){const m=k.match(/^(\w+) Essence of (\w+)$/);if(!m)continue;const i=tiers.indexOf(m[1]);if(i<0||i>5)continue;
+    const up=`${tiers[i+1]} Essence of ${m[2]}`;if(P(up))opp({cat:'essences',src:'extra',name:`3 ${m[1]} ${m[2]} → ${tiers[i+1]}`,note:'Sin azar',ins:[[k,3]],outs:[[up,1]],steps:['Compra las esencias en el intercambio.','Véndelas de a 3 iguales al NPC, o súbelas en la pestaña de esencias.','Vende la de nivel superior.']})}
+  const oils=['Clear','Sepia','Amber','Verdant','Teal','Azure','Indigo','Violet','Crimson','Black','Opalescent','Silver','Golden'];
+  for(let i=0;i<oils.length-1;i++)opp({cat:'essences',src:'extra',name:`3 ${oils[i]} Oil → ${oils[i+1]} Oil`,note:'Sin azar',ins:[[oils[i]+' Oil',3]],outs:[[oils[i+1]+' Oil',1]],steps:['Compra 3 aceites iguales.','Véndelos juntos al NPC.','Vende el aceite superior.']});
+  /* Cambios en Harvest con parada óptima */
+  const lf=P('Primal Crystallised Lifeforce');
+  const swap=(title,keys,src,warn,unv)=>{
+    const it=keys.map(P).filter(Boolean).map(x=>x.conf==='baja'?Object.assign({},x,{p:x.p/2}):x);if(!lf||it.length<3)return;
+    const k=lf.p*cfg.primal;let V=it.map(x=>x.p);
+    for(let r=0;r<400;r++){const sum=V.reduce((a,b)=>a+b,0);V=it.map((x,i)=>Math.max(x.p,(sum-V[i])/(it.length-1)-k))}
+    const stop=it.filter((x,i)=>V[i]-x.p<1e-6).sort((a,b)=>b.p-a.p);
+    it.forEach((x,i)=>{if(V[i]-x.p<1e-6||x.conf==='baja')return;
+      opp({cat:'essences',src,unv,rng:true,name:`Cambiar ${x.name}`,icon:x.icon,note:title,ins:[[x.key,1],['Primal Crystallised Lifeforce',cfg.primal,'Lifeforce del primer cambio']],outs:[[stop[0].key,1]],sell:V[i]+k,
+        steps:[`Compra ${x.name} a ${c(x.p)}.`,`Cámbiala en Harvest por ${cfg.primal} Primal (${c(k)} cada intento).`,`Detente cuando salga: ${stop.slice(0,6).map(s=>`${s.name.replace(/^Deafening /,'')} (${c(s.p)})`).join(', ')}. Con cualquier otra, vuelve a cambiar.`],warn})});
+  };
+  swap('Esencia corrupta',['Essence of Hysteria','Essence of Insanity','Essence of Delirium','Essence of Horror'],'video','Es un promedio, y supone que las demás salen con igual probabilidad. La venta ya descuenta los cambios extra.');
+  swap('Deafening',[...S.idx.keys()].filter(k=>k.startsWith('Deafening Essence')),'extra','Más arriesgado que las corruptas: hay muchas esencias posibles. Hazlo con poca cantidad.');
+  swap('Delirium Orb',[...S.idx.values()].filter(x=>x.type==='DeliriumOrb').map(x=>x.key),'video','Confirma el costo en la mesa de Harvest: solo lo vi en la herramienta del video. Los orbes sin precio en poe.ninja no entran en el promedio, así que la ganancia real puede ser menor.',true);
+  /* Cartas */
+  const card=(n,q,out,oq,note)=>opp({cat:'cards',src:'extra',name:n,note:note||`${q} → ${oq>1?oq+' ':''}${out}`,ins:[[n,q]],outs:[[out,oq]],steps:[`Compra ${q} ${n}.`,'Entrega el set completo.',`Vende ${oq>1?oq+' ':''}${out}.`],warn:'Confirma el tamaño del set en la carta: poe.ninja no lo publica.'});
+  [['The Patient',8,'The Nurse',1],['The Nurse',8,'The Doctor',1],['The Doctor',8,'Headhunter',1],['The Immortal',10,'House of Mirrors',1],['House of Mirrors',9,'Mirror of Kalandra',1],['Seven Years Bad Luck',13,'Mirror Shard',1],['Unrequited Love',16,'Mirror Shard',19],["Brother's Gift",1,'Divine Orb',5],['The Sephirot',11,'Divine Orb',10],['The Fortunate',12,'Divine Orb',2],['The Enlightened',6,'Enlighten Support (3)',1],['The Union',10,gcp,10],['The Gemcutter',3,gcp,1],['Three Faces in the Dark',7,'Chaos Orb',3],['Rain of Chaos',8,'Chaos Orb',1],['The Catalyst',3,'Vaal Orb',1],['No Traces',9,'Orb of Scouring',30],['Lucky Connections',7,'Orb of Fusing',20],['Coveted Possession',9,'Regal Orb',5]].forEach(a=>card(...a));
+  /* Recetas propias */
+  S.custom.forEach((r,i)=>opp({cat:'custom',src:'mía',name:r.name,ci:i,ins:r.in,outs:r.out,steps:['Receta creada por ti.']}));
+  S.opps.forEach(o=>{o.times=Math.max(0,Math.floor(cfg.budget/o.cost))});
+}
+
+/* ---------- Vistas ---------- */
+const TABS=[['top','Lo mejor ahora'],['links','Seis enlaces'],['gems','Gemas'],['recipes','Recetas y bestias'],['essences','Esencias y orbes'],['cards','Cartas'],['moves','Movimientos'],['custom','Mis recetas'],['log','Mi registro'],['cfg','Ajustes']];
+const INTRO={
+ top:'Todo lo que deja ganancia ahora mismo, ordenado por lo que rinde tu capital. Toca una fila para ver los pasos y los costos.',
+ links:'Compra un único sin enlazar, llévalo a seis enlaces por la vía más barata y véndelo. Incluye los petos del video y además arcos, bastones y armas de dos manos.',
+ gems:'Sube gemas de nivel o calidad y vende la diferencia. <b>poe.ninja no publica el precio del Facetor’s Lens</b>: pon aquí el que veas en el mercado.',
+ recipes:'Ventas al NPC, bestias, astillas y memorias cuyo resultado vale más que sus partes.',
+ essences:'Subidas de 3 a 1 sin azar, y cambios en Harvest con la regla de cuándo conviene parar.',
+ cards:'Sets de cartas de adivinación con premio fijo, comparados con el precio del premio.',
+ moves:'Lo que más subió y bajó en 7 días con volumen suficiente. Una subida no asegura que siga: úsalo para decidir qué vender ya y qué no acumular.',
+ custom:'Crea tu propia receta con cualquier artículo. Se recalcula con los precios nuevos.',
+ log:'Anota lo que haces y a cuánto vendiste de verdad, para saber qué método te rinde a ti.',
+ cfg:'Estos valores cambian todos los cálculos.'};
+function passes(o){const g=S.cfg;if(RANK[o.conf]<RANK[g.conf])return false;if(!g.rng&&o.rng)return false;if(!g.play&&o.play)return false;if(!g.neg&&o.net<=0)return false;if(S.q&&!(o.name+' '+(o.note||'')).toLowerCase().includes(S.q))return false;return true}
+function spark(s){const d=s&&s.data?s.data.map((v,i)=>[i,v]).filter(x=>x[1]!=null):[];if(d.length<2)return '';const ys=d.map(x=>x[1]),mn=Math.min(...ys),mx=Math.max(...ys),k=mx-mn||1;const pts=d.map(([x,y])=>(x/(s.data.length-1)*58+1).toFixed(1)+','+(17-(y-mn)/k*14).toFixed(1)).join(' ');return `<svg width="60" height="20" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`}
+const COLS=[
+ ['name','Qué',o=>o.name,o=>`<div class="nm">${o.icon?`<img src="${esc(o.icon)}" alt="" loading="lazy">`:''}<span><button data-open="${esc(o.id)}" aria-expanded="${S.open.has(o.id)}">${esc(o.name)}</button><i>${esc(o.note||'')}${o.rng?' · azar':''}${o.play?' · hay que jugar':''}${o.unv?' · por confirmar':''}</i></span></div>`],
+ ['cost','Costo',o=>o.cost,o=>c(o.cost)],
+ ['sell','Venta',o=>o.sell,o=>c(o.sell)],
+ ['net','Ganancia',o=>o.net,o=>`<span class="${cls(o.net)}">${sg(o.net)}</span><span class="sub">${dv(o.net)}</span>`],
+ ['roi','Retorno',o=>o.roi,o=>`<span class="${cls(o.net)}">${pct(o.roi)}</span>`],
+ ['tr','7 días',o=>o.tr==null?-1e9:o.tr,o=>o.tr==null?'':`<span class="${cls(o.tr)}">${spark(o.spark)}<span class="sub">${pct(o.tr)}</span></span>`],
+ ['conf','Confianza',o=>RANK[o.conf]*1e7+(o.n||o.vol||0),o=>`<span class="tag ${o.conf}">${o.conf}</span><span class="sub">${o.n!=null?num(o.n,0)+' anuncios':o.vol!=null?num(o.vol,0)+' c de volumen':''}</span>`]];
+function score(o){const w={alta:1,media:.5,baja:.15}[o.conf]*(o.rng?.6:1)*(o.play?.8:1)*(o.unv?.3:1)*(!o.ex&&(o.tr<-30||o.tr>300)?.4:1);return o.net*Math.min(o.times,o.ex?20:o.conf==='alta'?3:1)*w}
+function table(id,list,defKey){
+  const st=S.sort[id]||[defKey,-1];const col=COLS.find(x=>x[0]===st[0]);
+  list.sort((a,b)=>{const x=col?col[2](a):score(a),y=col?col[2](b):score(b);return(typeof x==='string'?x.localeCompare(y):x-y)*st[1]});
+  if(!list.length)return '<div class="tw"><div class="empty">Nada cumple los filtros. Baja la confianza mínima o marca “Mostrar pérdidas”.</div></div>';
+  const lim=S.show[id]||20;
+  let h=`<div class="tw"><table><thead><tr>`+COLS.map(([k,l])=>`<th class="${k==='name'?'l':''}" aria-sort="${st[0]===k?(st[1]>0?'ascending':'descending'):'none'}"><button data-sort="${id}|${k}">${l}${st[0]===k?(st[1]>0?' ↑':' ↓'):''}</button></th>`).join('')+'</tr></thead><tbody>';
+  for(const o of list.slice(0,lim)){
+    h+=`<tr class="row" data-row="${esc(o.id)}">`+COLS.map(([k,,,f])=>`<td class="${k==='name'?'l':''}">${f(o)}</td>`).join('')+'</tr>';
+    if(S.open.has(o.id))h+=detail(o);
+  }
+  h+='</tbody></table></div>';
+  if(list.length>lim)h+=`<div class="more"><button data-more="${id}">Ver más (${list.length-lim} restantes)</button></div>`;
+  return h;
+}
+/* El mercado oficial lleva la busqueda en la direccion: JSON -> gzip -> base64url. */
+function tradeQuery(it){
+  const foul=it.name.startsWith('Foulborn '),mod=m=>({id:m.mod,value:{},disabled:false});
+  const stats=[{type:'and',filters:(it.mods||[]).map(mod)}];
+  if(foul){ /* deja fuera las otras variantes del mismo unico */
+    const own=new Set((it.mods||[]).map(m=>m.mod)),other=new Set();
+    for(const x of S.idx.values())if(x.name===it.name&&x.base===it.base)(x.mods||[]).forEach(m=>{if(!own.has(m.mod))other.add(m.mod)});
+    if(other.size)stats.push({type:'not',filters:[...other].map(id=>mod({mod:id}))});
+  }
+  return{status:{option:'securable'},name:foul?it.name.slice(9):it.name,type:it.base,stats,filters:{misc_filters:{filters:{mutated:{option:foul?'true':'false'},corrupted:{option:'false'}}}}};
+}
+const links=new Map();
+async function tradeUrl(it){
+  const lg=$('#league').value,k=lg+'|'+it.key;if(links.has(k))return links.get(k);
+  const st=new Blob([JSON.stringify(tradeQuery(it))]).stream().pipeThrough(new CompressionStream('gzip'));
+  const by=new Uint8Array(await new Response(st).arrayBuffer());
+  const u=`https://www.pathofexile.com/trade/search/${encodeURIComponent(lg)}/`+btoa(String.fromCharCode(...by)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  links.set(k,u);return u;
+}
+function fillLinks(){document.querySelectorAll('a[data-trade]').forEach(async a=>{const it=P(a.dataset.trade);if(it)a.href=await tradeUrl(it)})}function detail(o){
+  const li=x=>`<li><span>${num(x.q,0)} × ${esc(x.label)}</span><span>${c(x.p*x.q)}</span></li>`;
+  const t=o.base&&P(o.base)||o.a.map(x=>x.it).find(x=>x&&x.type.startsWith('Unique'));
+  return `<tr class="det"><td colspan="${COLS.length}"><div class="g"><div><ol>${o.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>${o.w.map(w=>`<p class="warn">${esc(w)}</p>`).join('')}
+  <div class="acts"><button class="pri" data-log="${esc(o.id)}">Anotar en mi registro</button>${t&&t.base?`<a data-trade="${esc(t.key)}" target="_blank" rel="noopener">Buscar la base en el mercado oficial</a>`:''}${o.ci!=null?`<button data-delc="${o.ci}">Borrar receta</button>`:''}<span class="tag">${o.src==='video'?'Método del video':o.src==='mía'?'Receta tuya':'Método añadido'}</span></div></div>
+  <div><ul>${o.a.map(li).join('')}<li><b>Costo total</b><b>${c(o.cost)}</b></li><li><span>Venta estimada${o.rng?' (promedio)':''}</span><span>${c(o.sell)}</span></li><li><span>Descuento para vender rápido (${o.hc}%)</span><span>−${c(o.sell*o.hc/100)}</span></li><li><b>Ganancia</b><b class="${cls(o.net)}">${sg(o.net)}</b></li></ul>
+  <p class="mute">${o.times>0?`Con ${c(S.cfg.budget)} puedes hacerlo ${o.times} ${o.times===1?'vez':'veces'}: ${sg(o.net*o.times)} si vendes todo a este precio.`:`Con ${c(S.cfg.budget)} no alcanza para una vez.`}</p></div></div></td></tr>`;
+}
+function filters(){const g=S.cfg;return `<div class="filters">
+ <label>Mi capital <input type="number" min="1" data-cfg="budget" value="${g.budget}"> c</label>
+ <label title="Para ítems y gemas. El del intercambio está en Ajustes">Vender bajo el precio <input type="number" min="0" max="60" data-cfg="haircut" value="${g.haircut}" style="width:68px"> %</label>
+ <label>Confianza mínima <select data-cfg="conf">${['alta','media','baja'].map(x=>`<option ${g.conf===x?'selected':''}>${x}</option>`).join('')}</select></label>
+ <label><input type="checkbox" data-cfg="rng" ${g.rng?'checked':''}> Con azar</label>
+ <label><input type="checkbox" data-cfg="play" ${g.play?'checked':''}> Hay que jugar</label>
+ <label><input type="checkbox" data-cfg="neg" ${g.neg?'checked':''}> Mostrar pérdidas</label>
+ <label>Buscar <input type="search" id="q" value="${esc(S.q)}" placeholder="Nombre"></label></div>`}
+const lensForm=()=>`<div class="form">${[['l339','Lens 339 M'],['l500','Lens 500 M'],['l750','Lens 750 M']].map(([k,l])=>`<label>${l} (c)<input type="number" min="0" data-cfg="${k}" value="${S.cfg[k]}"></label>`).join('')}<span class="mute">Excepcionales: 3 lens = ${c(2*S.cfg.l500+S.cfg.l750)}; 4 Wild Brambleback = ${P('Wild Brambleback')?c(P('Wild Brambleback').p*4):'sin dato'}. Los cálculos usan lo más barato.</span></div>`;
+const V={
+ top(){const l=S.opps.filter(o=>passes(o)&&o.cost<=S.cfg.budget);
+   const b=l.slice().sort((x,y)=>score(y)-score(x));
+   const safe=b.find(o=>!o.rng&&!o.play&&o.conf==='alta'),roi=l.filter(o=>o.conf==='alta'&&!o.rng&&!o.unv&&o.net>=5).sort((x,y)=>y.roi-x.roi)[0],big=l.filter(o=>o.conf!=='baja'&&!o.unv).sort((x,y)=>y.net-x.net)[0];
+   const cd=(t,o)=>o?`<div class="card"><h3>${t}</h3><div class="big up">${sg(o.net)}</div><p>${esc(o.name)}</p><p>Cuesta ${c(o.cost)}, retorno ${pct(o.roi)}</p></div>`:'';
+   return filters()+`<div class="cards">${cd('Más segura',safe)}${cd('Mayor retorno',roi)}${cd('Mayor ganancia por unidad',big)}</div><h2>Oportunidades que alcanzan con tu capital</h2>`+table('top',l,'score')},
+ links(){return `<div class="cards">${S.routes.map((r,i)=>`<div class="card ${i?'':'best'}"><h3>${r.name}${i?'':', la más barata'}</h3><div class="big">${c(r.total)}</div>${r.parts.map(p=>`<p>${num(p[1],0)} × ${esc(p[0])}: ${c(P(p[0]).p*p[1])}</p>`).join('')}<p>${r.note}</p></div>`).join('')||'<div class="card">Faltan precios para calcular las vías.</div>'}</div>`+filters()+table('links',S.opps.filter(o=>o.cat==='links'&&passes(o)),'net')},
+ gems(){return lensForm()+filters()+table('gems',S.opps.filter(o=>o.cat==='gems'&&passes(o)),'net')},
+ recipes(){return filters()+table('recipes',S.opps.filter(o=>o.cat==='recipes'&&passes(o)),'net')},
+ essences(){return filters()+table('essences',S.opps.filter(o=>o.cat==='essences'&&passes(o)),'net')},
+ cards(){return filters()+table('cards',S.opps.filter(o=>o.cat==='cards'&&passes(o)),'net')},
+ moves(){const l=[...S.idx.values()].filter(x=>x.spark&&x.spark.data&&x.spark.data.filter(v=>v!=null).length>3&&x.conf==='alta'&&x.p>=3&&x.type!=='SkillGem'&&(x.ex?x.vol>=10000:x.n>=50));
+   const t=a=>`<div class="tw"><table><thead><tr><th class="l">Artículo</th><th>Precio</th><th>7 días</th><th>Movimiento</th></tr></thead><tbody>${a.slice(0,25).map(x=>`<tr><td class="l"><div class="nm">${x.icon?`<img src="${esc(x.icon)}" alt="" loading="lazy">`:''}<span>${esc(x.key)}</span></div></td><td>${c(x.p)}</td><td><span class="${cls(x.spark.totalChange)}">${spark(x.spark)}<span class="sub">${pct(x.spark.totalChange)}</span></span></td><td>${x.ex?num(x.vol,0)+' c':num(x.n,0)+' anuncios'}</td></tr>`).join('')}</tbody></table></div>`;
+   const s=l.sort((a,b)=>b.spark.totalChange-a.spark.totalChange);
+   return '<h2>Subiendo</h2>'+t(s.filter(x=>x.spark.totalChange>0))+'<h2>Bajando</h2>'+t(s.filter(x=>x.spark.totalChange<0).reverse())},
+ custom(){const d=S.draft,ps=k=>d[k].map((p,i)=>`<button data-rm="${k}|${i}" title="Quitar">${num(p[1],2)} × ${esc(p[0])} ✕</button>`).join('')||'<span class="mute">Nada todavía</span>';
+   return `<div class="form"><label>Artículo<input type="text" id="ci" list="dl" autocomplete="off" style="width:300px" placeholder="Escribe en inglés, p. ej. Simulacrum"></label><datalist id="dl"></datalist><label>Cantidad<input type="number" id="cq" value="1" min="0.01" step="any"></label><button data-addp="in">Añadir como costo</button><button data-addp="out">Añadir como venta</button><div class="parts"><span class="mute">Compras:</span> ${ps('in')}</div><div class="parts"><span class="mute">Vendes:</span> ${ps('out')}</div><label>Nombre de la receta<input type="text" id="cn" style="width:260px"></label><button class="pri" id="csave">Guardar receta</button><span class="down" id="cmsg" role="alert"></span></div><h2>Guardadas</h2>`+(S.custom.length?table('custom',S.opps.filter(o=>o.cat==='custom'),'net'):'<div class="tw"><div class="empty">Aún no guardas ninguna.</div></div>')},
+ log(){const l=S.log,r=l.filter(x=>x.real!=null&&x.real!==''),tot=r.reduce((s,x)=>s+(+x.real-x.cost)*1,0);
+   return `<div class="cards"><div class="card"><h3>Ganancia real</h3><div class="big ${cls(tot)}">${sg(tot)}</div><p>${dv(tot)} en ${r.length} ventas</p></div><div class="card"><h3>Por vender</h3><div class="big">${l.length-r.length}</div><p>${c(l.filter(x=>x.real==null||x.real==='').reduce((s,x)=>s+x.cost,0))} invertidos</p></div></div><h2>Anotaciones</h2>`+(l.length?`<div class="tw"><table><thead><tr><th class="l">Qué</th><th>Fecha</th><th>Costo (c)</th><th>Venta esperada</th><th>Vendido a (c)</th><th>Resultado</th><th></th></tr></thead><tbody>${l.map((x,i)=>`<tr><td class="l">${esc(x.name)}</td><td>${new Date(x.t).toLocaleDateString('es')}</td><td><input type="number" step="any" data-lc="${i}" value="${x.cost}" aria-label="Costo"></td><td>${c(x.sell)}</td><td><input type="number" step="any" data-lr="${i}" value="${x.real==null?'':x.real}" aria-label="Vendido a"></td><td class="${x.real?cls(x.real-x.cost):''}">${x.real!=null&&x.real!==''?sg(x.real-x.cost):''}</td><td><button data-ld="${i}">Borrar</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="tw"><div class="empty">Abre una oportunidad y pulsa “Anotar en mi registro”.</div></div>')},
+ cfg(){const f=[['haircut','Vender bajo el precio: ítems y gemas (%)'],['hcEx','Vender bajo el precio: intercambio (%)'],['budget','Mi capital (c)'],['l339','Lens 339 M (c)'],['l500','Lens 500 M (c)'],['l750','Lens 750 M (c)'],['primal','Primal por cambio en Harvest'],['p21','Probabilidad de 21/20 (%)'],['p23','Probabilidad de 20/23 (%)']];
+   return `<div class="form">${f.map(([k,l])=>`<label>${l}<input type="number" step="any" min="0" data-cfg="${k}" value="${S.cfg[k]}"></label>`).join('')}<button id="reset">Volver a los valores iniciales</button></div><p class="intro"><b>Confianza alta</b>: 30 anuncios o más, o buen volumen en el intercambio. <b>Media</b>: entre 10 y 29 anuncios. <b>Baja</b>: menos; el precio puede estar inflado.</p>`}
+};
+function render(){
+  const cnt=k=>k==='top'?0:S.opps.filter(o=>o.cat===k&&passes(o)&&o.net>0).length;
+  $('#tabs').innerHTML=TABS.map(([k,l])=>{const n=['links','gems','recipes','essences','cards'].includes(k)?cnt(k):0;return `<button role="tab" data-tab="${k}" aria-selected="${S.tab===k}">${l}${n?`<small>${n}</small>`:''}</button>`}).join('');
+  const a=document.activeElement,fid=a&&(a.id||(a.dataset&&a.dataset.cfg)),pos=a&&a.type==='search'?a.selectionStart:null;
+  $('#main').innerHTML=`<p class="intro">${INTRO[S.tab]}</p>`+(S.idx.size||S.tab==='cfg'?V[S.tab]():'<div class="empty">Cargando precios de poe.ninja…</div>');
+  fillLinks();
+  if(fid){const e=document.getElementById(fid)||document.querySelector(`[data-cfg="${fid}"]`);if(e){e.focus();if(pos!=null)e.setSelectionRange(pos,pos)}}
+}
+/* ---------- Eventos ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button,a,input,select,tr.row');if(!t)return;const d=t.dataset;
+  if(t.tagName==='A'||t.tagName==='INPUT'||t.tagName==='SELECT')return;
+  const tog=id=>{S.open.has(id)?S.open.delete(id):S.open.add(id);render()};
+  if(d.tab){S.tab=d.tab;store.set('tab',d.tab);S.q='';render();window.scrollTo(0,0)}
+  else if(d.open)tog(d.open);
+  else if(d.row)tog(d.row);
+  else if(d.sort){const[i,k]=d.sort.split('|');const o=S.sort[i];S.sort[i]=[k,o&&o[0]===k?-o[1]:k==='name'||k==='cost'?1:-1];render()}
+  else if(d.more){S.show[d.more]=(S.show[d.more]||20)+30;render()}
+  else if(d.log){const o=S.opps.find(x=>x.id===d.log);if(o){S.log.unshift({name:o.name,t:Date.now(),cost:Math.round(o.cost*10)/10,sell:o.sell,real:null});store.set('log',S.log);t.textContent='Anotado';t.disabled=true}}
+  else if(d.ld){S.log.splice(+d.ld,1);store.set('log',S.log);render()}
+  else if(d.delc){S.custom.splice(+d.delc,1);store.set('custom',S.custom);compute();render()}
+  else if(d.addp){const k=$('#ci').value.trim(),q=+$('#cq').value;if(!P(k)){$('#cmsg').textContent='Elige un artículo de la lista.';return}if(!(q>0)){$('#cmsg').textContent='La cantidad debe ser mayor que 0.';return}S.draft[d.addp].push([k,q]);render()}
+  else if(d.rm){const[k,i]=d.rm.split('|');S.draft[k].splice(+i,1);render()}
+  else if(t.id==='csave'){const n=$('#cn').value.trim();if(!S.draft.in.length||!S.draft.out.length||!n){$('#cmsg').textContent='Falta el nombre, un costo o una venta.';return}if(S.custom.some(r=>r.name===n)){$('#cmsg').textContent='Ya tienes una receta con ese nombre.';return}S.custom.push({name:n,in:S.draft.in,out:S.draft.out});S.draft={in:[],out:[]};store.set('custom',S.custom);compute();render()}
+  else if(t.id==='reset'){S.cfg=Object.assign({},DEF);store.set('cfg',S.cfg);compute();render()}
+  else if(t.id==='reload')load();
+});
+document.addEventListener('change',e=>{
+  const t=e.target,d=t.dataset;
+  if(d.cfg){S.cfg[d.cfg]=t.type==='checkbox'?t.checked:t.type==='number'?Math.max(0,+t.value||0):t.value;store.set('cfg',S.cfg);compute();render()}
+  else if(d.lr!=null){S.log[+d.lr].real=t.value===''?null:+t.value;store.set('log',S.log);render()}
+  else if(d.lc!=null){S.log[+d.lc].cost=+t.value||0;store.set('log',S.log);render()}
+  else if(t.id==='league'){store.set('league',t.value);load()}
+});
+let qt;
+document.addEventListener('input',e=>{
+  if(e.target.id==='q'){S.q=e.target.value.toLowerCase();clearTimeout(qt);qt=setTimeout(render,180)}
+  if(e.target.id==='ci'){const v=e.target.value.toLowerCase();if(v.length<2)return;const o=[];for(const k of S.idx.keys()){if(k.toLowerCase().includes(v))o.push(k);if(o.length>=40)break}$('#dl').innerHTML=o.map(k=>`<option value="${esc(k)}">`).join('')}
+});
+(async()=>{
+  render();
+  try{const l=await getJ('/api/leagues');const sv=store.get('league',null);$('#league').innerHTML=l.map(x=>`<option value="${esc(x.id)}" ${x.id===sv?'selected':''}>${esc(x.name)}</option>`).join('');await load();setInterval(load,15*60*1000)}
+  catch(e){setStatus('No se pudo conectar. Abre la página con Abrir.bat y revisa tu internet.',true);console.error(e)}
+})();
+</script>
+</body>
+</html>

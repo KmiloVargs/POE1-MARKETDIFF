@@ -1,0 +1,1 @@
+Para iniciar sólo deben correr Abrir, el navegador se abrirá solo. Si no ocurre, en Chrome, Firefox u Opera entrar a https://localhost:8377/
